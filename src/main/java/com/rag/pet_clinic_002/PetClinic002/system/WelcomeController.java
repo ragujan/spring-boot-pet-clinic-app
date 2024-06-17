@@ -10,7 +10,8 @@ class WelcomeController {
 
 	@GetMapping("/")
 	public String welcome() {
-		return "welcome";
+		// return "welcome";
+		return "owners/createOrUpdateOwnerForm";
 	}
 
 }
