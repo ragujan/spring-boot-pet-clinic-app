@@ -1,11 +1,11 @@
-package com.rag.pet_clinic_002.PetClinic002.model;
+package com.rag.pet_clinic_002.PetClinic002.base_model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
 @MappedSuperclass
-public class Person {
+public class Person extends BaseEntity{
 
 	@Column(name= "first_name")
 	@NotBlank

@@ -1,4 +1,4 @@
-package com.rag.pet_clinic_002.PetClinic002.model;
+package com.rag.pet_clinic_002.PetClinic002.base_model;
 
 import java.io.Serializable;
 
