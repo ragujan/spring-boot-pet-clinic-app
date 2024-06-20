@@ -15,9 +15,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+
 @WebMvcTest(OwnerController.class)
 @DisabledInNativeImage
 @DisabledInAotMode
@@ -49,13 +51,35 @@ public class OwnerControllerTest {
 		given(this.owners.findByLastName(eq("Franklin"), any(Pageable.class)))
 				.willReturn(new PageImpl<>(Lists.newArrayList(george)));
 	}
+
 	@Test
 	void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/owners/new"))
-		// mockMvc.perform(get("/"))
-			.andExpect(status().isOk())
-			.andExpect(model().attributeExists("owner"))
-			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+				// mockMvc.perform(get("/"))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeExists("owner"))
+				.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
+	// Test whether the owner is created successfully
+	@Test
+	void testOwnerCreationFormSuccess() throws Exception {
+		mockMvc
+				.perform(post("/owners/new").param("firstName", "Joe")
+						.param("lastName", "Bloggs")
+						.param("address", "123 Caramel Street")
+						.param("city", "London")
+						.param("telephone", "0777111555"))
+				.andExpect(status().isOk());
+	}
+	@Test
+	void testProcessCreationFormHasErrors() throws Exception {
+		mockMvc
+			.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city", "London"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "address"))
+			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
 }
