@@ -1,12 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=
     , initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
-    
+    <h1>Owner Information</h1>
+    <div th:if="${message}">
+        <span th:text="${message}"></span>
+    </div>
+    <div th:if="${error}">
+        <span th:text="${error}"></span>
+    </div>
+
+
+    <table class="table " th:object="${owner}">
+        <tr>
+            <th>First Name</th>
+            <td><b th:text="*{firstName}"></b></td>
+        </tr>
+        <tr>
+            <th>Last Name</th>
+            <td><b th:text="*{lastName}"></b></td>
+        </tr>
+
+        <tr>
+            <th>City</th>
+            <td><b th:text="*{city}"></b></td>
+        </tr>
+        <tr>
+            <th>Address</th>
+            <td><b th:text="*{address}"></b></td>
+        </tr>
+        <tr>
+            <th>Contact</th>
+            <td><b th:text="*{telephone}"></b></td>
+        </tr>
+
+    </table>
 </body>
+
 </html>

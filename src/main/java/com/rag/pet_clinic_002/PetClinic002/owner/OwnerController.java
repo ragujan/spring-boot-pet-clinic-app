@@ -50,8 +50,10 @@ public class OwnerController {
             return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
         }
         this.owners.save(owner);
+        Integer id = owner.getId();
         redirectAttributes.addFlashAttribute("message", "New Owner Created");
-        return OWNER_CREATE_SUCCEESS_PAGE;
+        // return "owners/"+id;
+        return "redirect:/owners/" + owner.getId();
     }
 
     @GetMapping("/owners/{ownerId}")
