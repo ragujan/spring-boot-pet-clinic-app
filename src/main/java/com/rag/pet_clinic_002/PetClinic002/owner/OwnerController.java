@@ -4,7 +4,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,11 @@ public class OwnerController {
         this.owners = owners;
     }
 
+	@InitBinder
+	public void setAllowedFields(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
+
     @GetMapping("/owners/new")
     public String initCreationForm(Map<String, Object> model) {
         Owner owner = new Owner();
@@ -33,8 +40,6 @@ public class OwnerController {
     public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
         //TODO: process POST request
           
-        System.out.println("owner first name "+owner.getFirstName());
-        System.out.println("owner last name "+owner.getLastName());
         if(result.hasErrors()){
         	System.out.println("result error ");
             redirectAttributes.addFlashAttribute("error","There was an errr in creating the owner");
