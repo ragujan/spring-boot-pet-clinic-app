@@ -7,12 +7,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @Controller
@@ -48,8 +52,14 @@ public class OwnerController {
         this.owners.save(owner);
         redirectAttributes.addFlashAttribute("message", "New Owner Created");
         return OWNER_CREATE_SUCCEESS_PAGE;
+    }
 
-        
+    @GetMapping("/owners/{ownerId}")
+    public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
+        ModelAndView mav = new ModelAndView("owners/ownerDetails") ;
+        Owner owner = this.owners.findById(ownerId);
+        mav.addObject(owner);
+        return  mav;
     }
     
 

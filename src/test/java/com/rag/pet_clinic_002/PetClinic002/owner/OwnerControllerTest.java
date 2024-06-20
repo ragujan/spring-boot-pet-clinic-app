@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.hamcrest.Matchers.hasProperty;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -19,11 +21,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.hamcrest.Matchers.is;
 
 @WebMvcTest(OwnerController.class)
 @DisabledInNativeImage
 @DisabledInAotMode
-
 public class OwnerControllerTest {
 	private static final int TEST_OWNER_ID = 1;
 
@@ -50,6 +52,7 @@ public class OwnerControllerTest {
 		Owner george = george();
 		given(this.owners.findByLastName(eq("Franklin"), any(Pageable.class)))
 				.willReturn(new PageImpl<>(Lists.newArrayList(george)));
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(george);
 	}
 
 	@Test
@@ -66,20 +69,44 @@ public class OwnerControllerTest {
 	void testOwnerCreationFormSuccess() throws Exception {
 		mockMvc
 				.perform(post("/owners/new").param("firstName", "Joe")
-						.param("lastName", "Bloggs")
-						.param("address", "123 Caramel Street")
+						.param("lastName", "Biden")
+						.param("address", "street 123")
 						.param("city", "London")
 						.param("telephone", "0777111555"))
 				.andExpect(status().isOk());
 	}
+
 	@Test
 	void testProcessCreationFormHasErrors() throws Exception {
 		mockMvc
-			.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city", "London"))
-			.andExpect(status().isOk())
-			.andExpect(model().attributeHasErrors("owner"))
-			.andExpect(model().attributeHasFieldErrors("owner", "address"))
-			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
-			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+				.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city",
+						"London"))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeHasErrors("owner"))
+				.andExpect(model().attributeHasFieldErrors("owner", "address"))
+				.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+				.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testShowOwnerDetails() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))
+				.andExpect(status().isOk())
+				.andExpect(model().attribute("owner", hasProperty("firstName", is("George"))));
+
+		;
+	}
+
+	@Test
+	void testShowOwner() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))
+				.andExpect(status().isOk())
+				.andExpect(model().attribute("owner", hasProperty("lastName", is("Franklin"))))
+				.andExpect(model().attribute("owner", hasProperty("firstName", is("George"))))
+				.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
+				.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
+				.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+				.andExpect(view().name("owners/ownerDetails"));
+
 	}
 }
