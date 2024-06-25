@@ -67,20 +67,17 @@ public class OwnerController {
     }
 
     @PostMapping("/owners/{ownerId}/edit")
-    // this controller will receive
-    // a valid owner object, binding result object, path variable int as owner id
     public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", "There was an error in updating the owner");
+            redirectAttributes.addFlashAttribute("error", "There was an error in updating the owner.");
             return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
         }
 
         owner.setId(ownerId);
         this.owners.save(owner);
-        redirectAttributes.addFlashAttribute("message", "Owner updated successfully");
+        redirectAttributes.addFlashAttribute("message", "Owner Values Updated");
         return "redirect:/owners/{ownerId}";
-
     }
 
 }
