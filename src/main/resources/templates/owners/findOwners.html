@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Owner</title>
+</head>
+
+<body>
+    <h1>Find Owners</h1>
+    <form th:object="${owner}" th:action="@{/owners}" method="get">
+        <!-- <input type="text" th:field="*{lastName}" /> -->
+        <label class="col-sm-2 control-label">Last name </label>
+        <input th:field="*{lastName}" size="30" maxlength="80" />
+        <div th:if="${#fields.hasAnyErrors()}">
+            <p th:each="err : ${#fields.allErrors()}" th:text="${err}">Error</p>
+        </div>
+        </span>
+    </form>
+</body>
+
+</html>
