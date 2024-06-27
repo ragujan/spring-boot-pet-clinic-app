@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Owners</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>Telephone</th>
+                <th>Pets</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each=" owner: ${listOwners}">
+                <td>
+                    <a th:href="@{/owners/__${owner.id}__}" th:text="${owner.firstName+' '+owner.lastName}"></a>
+                </td>
+                <td th:text="${owner.address}" />
+                <td th:text="${owner.city}" />
+                <td th:text="${owner.telephone}" />
+                <td>
+                    <!-- Pets section -->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <br>
+    <span>Current page is </span>
+    <span th:text="${currentPage}"></span>
+    <br>
+    <br>
+
+    <span>Total pages</span>
+    <span th:text="${totalPages}"></span>
+    <br>
+    <br>
+    <span>Pages:</span>
+    <span>[</span>
+    <!-- pagination buttons -->
+    <span th:each="i: ${#numbers.sequence(1,totalPages)}">
+        <a th:if="${currentPage != i}" th:href="@{'/owners?page='+${i}+'&lastName=ragbag1'}">[[${i}]]</a>
+        <span th:unless="${currentPage !=i}">[[${i}]]</span>
+    </span>
+    <span>]&nbsp;</span>
+
+    <!-- previous button -->
+    <span>
+        <a th:if="${currentPage>1}" th:href="${'owners?page=__${currentPage-1}__'}" title="previous">
+
+        </a>
+        <span th:unless="${currentPage > 1}" title="Previous" class="fa fa-step-backward"></span>
+    </span>
+    <!-- Next button -->
+
+    <span>
+        <a th:if="${currentPage < totalPages}" th:href="@{'/owners?page=__${currentPage + 1}__'}" title="Next"></a>
+        <span th:unless="${currentPage < totalPages}" title="Next">next</span>
+    </span>
+    <!-- Show last page -->
+    <span>
+        <a th:if="${currentPage < totalPages}" th:href="@{'/owners?page=__${totalPages}__'}" title="Last"></a>
+        <span th:unless="${currentPage < totalPages}" title="Last"></span>
+    </span>
+</body>
+
+</html>

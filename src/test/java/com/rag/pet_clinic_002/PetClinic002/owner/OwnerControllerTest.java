@@ -4,9 +4,11 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.aot.DisabledInAotMode;
@@ -14,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -55,6 +58,7 @@ public class OwnerControllerTest {
 		given(this.owners.findById(TEST_OWNER_ID)).willReturn(george);
 	}
 
+	// owner creation tests start here
 	@Test
 	void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/owners/new"))
@@ -65,17 +69,17 @@ public class OwnerControllerTest {
 	}
 
 	// Test whether the owner is created successfully
+	
 	@Test
-	void testOwnerCreationFormSuccess() throws Exception {
+	void testProcessCreationFormSuccess() throws Exception {
 		mockMvc
 				.perform(post("/owners/new").param("firstName", "Joe")
-						.param("lastName", "Biden")
-						.param("address", "street 123")
+						.param("lastName", "Bloggs")
+						.param("address", "123 Caramel Street")
 						.param("city", "London")
-						.param("telephone", "0777111555"))
-				.andExpect(status().isOk());
+						.param("telephone", "1316761638"))
+				.andExpect(status().is3xxRedirection());
 	}
-
 	@Test
 	void testProcessCreationFormHasErrors() throws Exception {
 		mockMvc
@@ -157,6 +161,48 @@ public class OwnerControllerTest {
 				.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
 				.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
-	
+
+	// search owners and list owners tests section
+	@Test
+	void testProcessFindFormByLastName() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(Lists.newArrayList(george()));
+		Mockito.when(this.owners
+				.findByLastName(eq("Franklin"), any(Pageable.class)))
+				.thenReturn(tasks);
+		mockMvc.perform(get("/owners?page=1").param("lastName", "Franklin"))
+				.andExpect(status().is3xxRedirection())
+				.andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
+
+	}
+
+	@Test
+	void testProcessFindFormNoOwnersFound() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(Lists.newArrayList());
+		Mockito.when(this.owners.findByLastName(eq("Unknown Surname"), any(Pageable.class)))
+				.thenReturn(tasks);
+
+		mockMvc.perform(get("/owners?page=1").param("lastName", "Unknown Surname"))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeHasFieldErrors("owner", "lastName"))
+				.andExpect(model().attributeHasFieldErrorCode("owner", "lastName", "notFound"))
+				.andExpect(view().name("owners/findOwners"));
+
+	}
+
+	@Test
+	void testProcessFindFormSuccess() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(Lists.newArrayList(george(), new Owner()));
+		Mockito.when(this.owners.findByLastName(anyString(), any(Pageable.class))).thenReturn(tasks);
+		mockMvc.perform(get("/owners?page=1")).andExpect(status().isOk()).andExpect(view().name("owners/ownersList"));
+	}
+
+	@Test
+	void testInitFindForm() throws Exception {
+		mockMvc.perform(get("/owners/find"))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeExists("owner"))
+				.andExpect(view().name("owners/findOwners"));
+	}
+
 
 }

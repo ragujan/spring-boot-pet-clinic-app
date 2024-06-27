@@ -3,6 +3,7 @@ package com.rag.pet_clinic_002.PetClinic002.owner;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,111 +22,126 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
-
 @Controller
 public class OwnerController {
-    private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
-    private final OwnerRepository owners;
 
-    public OwnerController(OwnerRepository owners) {
-        this.owners = owners;
-    }
+	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
 
-    @InitBinder
-    public void setAllowedFields(WebDataBinder dataBinder) {
-        dataBinder.setDisallowedFields("id");
-    }
+	private final OwnerRepository owners;
 
-    @ModelAttribute("owner")
-    public Owner findOwner(@PathVariable(name = "ownerId", required = false) Integer ownerId) {
-        return ownerId == null ? new Owner() : this.owners.findById(ownerId);
-    }
+	@Autowired
+	public OwnerController(OwnerRepository clinicService) {
+		this.owners = clinicService;
+	}
 
+	@InitBinder
+	public void setAllowedFields(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
 
-    @GetMapping("/owners/new")
-    public String initCreationForm(Map<String, Object> model) {
-        Owner owner = new Owner();
-        model.put("owner", owner);
-        return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
-    }
+	@ModelAttribute("owner")
+	public Owner findOwner(@PathVariable(name = "ownerId", required = false) Integer ownerId) {
+		return ownerId == null ? new Owner() : this.owners.findById(ownerId);
+	}
 
-    @PostMapping("/owners/new")
-    public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            System.out.println("result error ");
-            redirectAttributes.addFlashAttribute("error", "There was an errr in creating the owner");
-            return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
-        }
-        this.owners.save(owner);
-        redirectAttributes.addFlashAttribute("message", "New Owner Created");
-        // return "owners/"+id;
-        return "redirect:/owners/" + owner.getId();
-    }
+	@GetMapping("/owners/new")
+	public String initCreationForm(Map<String, Object> model) {
+		Owner owner = new Owner();
+		model.put("owner", owner);
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
 
-    @GetMapping("/owners/{ownerId}")
-    public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
-        ModelAndView mav = new ModelAndView("owners/ownerDetails");
-        Owner owner = this.owners.findById(ownerId);
-        mav.addObject(owner);
-        return mav;
-    }
+	@PostMapping("/owners/new")
+	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("error", "There was an error in creating the owner.");
+			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		}
 
-    @GetMapping("/owners/{ownerId}/edit")
-    public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
-        Owner owner = this.owners.findById(ownerId);
-        model.addAttribute(owner);
-        return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
-    }
+		this.owners.save(owner);
+		redirectAttributes.addFlashAttribute("message", "New Owner Created");
+		return "redirect:/owners/" + owner.getId();
+	}
 
-    @PostMapping("/owners/{ownerId}/edit")
-    public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
-            RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", "There was an error in updating the owner.");
-            return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
-        }
+	@GetMapping("/owners/find")
+	public String initFindForm() {
+		return "owners/findOwners";
+	}
 
-        owner.setId(ownerId);
-        this.owners.save(owner);
-        redirectAttributes.addFlashAttribute("message", "Owner Values Updated");
-        return "redirect:/owners/{ownerId}";
-    }
+	@GetMapping("/owners")
+	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
+			Model model) {
+		// allow parameterless GET request for /owners to return all records
+		if (owner.getLastName() == null) {
+			owner.setLastName(""); // empty string signifies broadest possible search
+		}
 
-    @GetMapping("/owners/find")
-    public String initFindForm() {
-        return "owners/findOwners";
-    }
+		// find owners by last name
+		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, owner.getLastName());
+		if (ownersResults.isEmpty()) {
+			// no owners found
+			result.rejectValue("lastName", "notFound", "not found");
+			return "owners/findOwners";
+		}
 
-    private Page<Owner> findPaginatedForOwnersLastName(int page, String lastName){
-            int pageSize = 5;
-            Pageable pageable = PageRequest.of(page-1,pageSize);
-            return owners.findByLastName(lastName, pageable);
-    }
+		if (ownersResults.getTotalElements() == 1) {
+			// 1 owner found
+			owner = ownersResults.iterator().next();
+			return "redirect:/owners/" + owner.getId();
+		}
 
-    @GetMapping("/owners")
-    public String processFineForm(@RequestParam(defaultValue = "1") int pageNumber, Owner owner,BindingResult result,Model model) {
-        if(owner.getLastName()==null){
-            owner.setLastName("");
-        }
-        Page<Owner> ownersResults = findPaginatedForOwnersLastName(pageNumber,owner.getLastName());
-        if(ownersResults.isEmpty()){
-            // no owners found
-            result.rejectValue("lastName","notFound","not found");
-            return "owners/findOwners";
-        }
-        if(ownersResults.getTotalElements()==1){
-            //1 owner found
-            owner = ownersResults.iterator().next();
-            return "redirect:/owners/"+owner.getId();
-        }
+		// multiple owners found
+		return addPaginationModel(page, model, ownersResults);
+	}
 
+	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
+		List<Owner> listOwners = paginated.getContent();
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", paginated.getTotalPages());
+		model.addAttribute("totalItems", paginated.getTotalElements());
+		model.addAttribute("listOwners", listOwners);
+		return "owners/ownersList";
+	}
 
-        return "owners/findOwners";
-    }
-    
-    
+	private Page<Owner> findPaginatedForOwnersLastName(int page, String lastname) {
+		int pageSize = 1;
+		Pageable pageable = PageRequest.of(page - 1, pageSize);
+		return owners.findByLastName(lastname, pageable);
+	}
 
-    
+	@GetMapping("/owners/{ownerId}/edit")
+	public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
+		Owner owner = this.owners.findById(ownerId);
+		model.addAttribute(owner);
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/owners/{ownerId}/edit")
+	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
+			RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("error", "There was an error in updating the owner.");
+			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		}
+
+		owner.setId(ownerId);
+		this.owners.save(owner);
+		redirectAttributes.addFlashAttribute("message", "Owner Values Updated");
+		return "redirect:/owners/{ownerId}";
+	}
+
+	/**
+	 * Custom handler for displaying an owner.
+	 * 
+	 * @param ownerId the ID of the owner to display
+	 * @return a ModelMap with the model attributes for the view
+	 */
+	@GetMapping("/owners/{ownerId}")
+	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
+		ModelAndView mav = new ModelAndView("owners/ownerDetails");
+		Owner owner = this.owners.findById(ownerId);
+		mav.addObject(owner);
+		return mav;
+	}
 
 }
