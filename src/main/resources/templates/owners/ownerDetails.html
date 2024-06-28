@@ -42,6 +42,29 @@
         </tr>
 
     </table>
+    <br>
+    <br>
+    <h4>Pet section</h4>
+    <table>
+        <tr th:each=" pet: ${owner.pets}">
+
+            <td>
+                <dl>
+                    <dt>----------</dt>
+                    <dt>Name</dt>
+                    <dd th:text="${pet.name}"></dd>
+                
+                    <dt>Birth date</dt>
+                    <dd th:text="${#temporals.format(pet.birthDate,'yyy-MM-dd')}"></dd>
+
+                    <dt>Type</dt>
+                    <dd th:text="${pet.type}"></dd>
+                </dl>
+            </td>
+        </tr>
+    </table>
+
+
 </body>
 
 </html>

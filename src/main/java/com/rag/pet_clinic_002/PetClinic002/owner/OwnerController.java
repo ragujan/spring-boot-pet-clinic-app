@@ -3,7 +3,6 @@ package com.rag.pet_clinic_002.PetClinic002.owner;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,6 @@ public class OwnerController {
 
 	private final OwnerRepository owners;
 
-	@Autowired
 	public OwnerController(OwnerRepository clinicService) {
 		this.owners = clinicService;
 	}

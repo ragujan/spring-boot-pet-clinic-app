@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.Locale;
 
 import org.springframework.format.Formatter;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PetTypeFormatter implements Formatter<PetType>{
 
     private final OwnerRepository owners;
