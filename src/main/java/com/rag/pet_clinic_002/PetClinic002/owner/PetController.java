@@ -101,16 +101,19 @@ public class PetController {
         owner.addpet(pet);
         modelMap.put("pet", pet);
         modelMap.put("owner", owner);
+        // process to check duplicate name
         if(StringUtils.hasText(pet.getName()) 
         && pet.isNew() 
         && owner.getPetByName(pet.getName(), true) !=null ){
             bindingResult.rejectValue("name","duplicate","already exists");
         }
+        // process to check if the birthdate is valid
         LocalDate currentDate = LocalDate.now();
         if(pet.getBirthDate()!=null && pet.getBirthDate().isAfter(currentDate)){
             bindingResult.rejectValue("birthDate","Type mis match.birthDate");
         }
         owner.addpet(pet);
+        // if there is errors in binding results 
         if(bindingResult.hasErrors()){
             modelMap.put("pet",pet);
             return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
