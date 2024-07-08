@@ -32,7 +32,7 @@ public class Pet extends NamedEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "pet_id")
     @OrderBy("visit_date ASC")
-    private Set<Visit> vists = new LinkedHashSet<>();
+    private Set<Visit> visits = new LinkedHashSet<>();
 
     public LocalDate getBirthDate() {
         return birthDate;
@@ -50,12 +50,12 @@ public class Pet extends NamedEntity {
         this.type = type;
     }
 
-    public Set<Visit> getVists() {
-        return vists;
+    public Set<Visit> getVisits() {
+        return visits;
     }
 
     public void addVisit(Visit vist) {
-        getVists().add(vist);
+        getVisits().add(vist);
     }
 
 }

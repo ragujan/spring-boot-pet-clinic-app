@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.util.Assert;
 
 import com.rag.pet_clinic_002.PetClinic002.base_model.Person;
 
@@ -111,6 +112,16 @@ public class Owner extends Person {
 		if(pet.isNew()){
 			getPets().add(pet);
 		}
+	}
+	public void addVisit(Integer petId, Visit visit){
+		Assert.notNull(petId, "Pet identifier must not be null");
+		Assert.notNull(visit, "Visit must not be null");
+
+		Pet pet = getPetById(petId);
+
+		Assert.notNull(pet, "Invalid Pet identifier");
+
+		pet.addVisit(visit);
 	}
 
 }

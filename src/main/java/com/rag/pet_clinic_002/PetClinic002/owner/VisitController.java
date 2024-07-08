@@ -3,12 +3,20 @@ package com.rag.pet_clinic_002.PetClinic002.owner;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @Controller
@@ -38,6 +46,18 @@ public class VisitController {
     @GetMapping("/owners/{ownerId}/pets/{petId}/visits/new")
     public String initNewVisitForm() {
         return "pets/createOrUpdateVisitForm";
+    }
+    @PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
+    public String processNewVisit(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,BindingResult result, RedirectAttributes redirectAttributes) {
+        if(result.hasErrors()){
+            return "pets/createOrUpdateVisitForm";
+        }
+        System.out.println("received date is "+visit.getDate());
+        owner.addVisit(petId, visit);
+        this.ownerRepository.save(owner);
+        redirectAttributes.addFlashAttribute("message", "Your visit has been booked");
+        // return null;
+        return "redirect:/owners/{ownerId}";
     }
     
 

@@ -6,9 +6,99 @@
     <meta name="viewport" content="width=
     , initial-scale=1.0">
     <title>Owner Details</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
 </head>
 
-<body>
+<body class="text-gray-800 bg-gray-300">
+
+    <div class="container p-6 mx-auto">
+        <h1 class="mb-4 text-3xl font-bold">Owner Information</h1>
+
+        <div th:if="${message}" class="p-4 mb-4 text-green-700 bg-green-100 border-l-4 border-green-500">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="p-4 mb-4 text-red-700 bg-red-100 border-l-4 border-red-500">
+            <span th:text="${error}"></span>
+        </div>
+
+        <table class="min-w-full mb-6 overflow-hidden bg-white rounded-lg shadow">
+            <tbody th:object="${owner}">
+                <tr>
+                    <th class="px-4 py-2 border">First Name</th>
+                    <td class="px-4 py-2 border"><b th:text="*{firstName}"></b></td>
+                </tr>
+                <tr>
+                    <th class="px-4 py-2 border">Last Name</th>
+                    <td class="px-4 py-2 border"><b th:text="*{lastName}"></b></td>
+                </tr>
+                <tr>
+                    <th class="px-4 py-2 border">City</th>
+                    <td class="px-4 py-2 border"><b th:text="*{city}"></b></td>
+                </tr>
+                <tr>
+                    <th class="px-4 py-2 border">Address</th>
+                    <td class="px-4 py-2 border"><b th:text="*{address}"></b></td>
+                </tr>
+                <tr>
+                    <th class="px-4 py-2 border">Contact</th>
+                    <td class="px-4 py-2 border"><b th:text="*{telephone}"></b></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4 class="mb-4 text-xl font-semibold">Pet section</h4>
+        <table class="min-w-full overflow-hidden bg-white rounded-lg shadow">
+            <tbody>
+                <tr th:each="pet: ${owner.pets}">
+                    <td class="px-4 py-4 border">
+                        <dl>
+                            <dt class="text-gray-600">----------</dt>
+                            <dt class="font-bold">Name</dt>
+                            <dd th:text="${pet.name}" class="mb-2"></dd>
+
+                            <dt class="font-bold">Birth date</dt>
+                            <dd th:text="${#temporals.format(pet.birthDate,'yyy-MM-dd')}" class="mb-2"></dd>
+
+                            <dt class="font-bold">Type</dt>
+                            <dd th:text="${pet.type}" class="mb-2"></dd>
+
+                            <dt class="font-bold">Edit Pet</dt>
+                            <span>
+                                <a th:href="@{'/owners/__${owner.id}__/pets/__${pet.id}__/edit'}"
+                                    class="text-blue-500 hover:underline">Edit</a>
+                            </span>
+                        </dl>
+                    </td>
+                    <td class="px-4 py-4 border">
+                        <table class="min-w-full overflow-hidden bg-white rounded-lg shadow">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 border">Visit Date</th>
+                                    <th class="px-4 py-2 border">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="visit: ${pet.visits}">
+                                    <td class="px-4 py-2 border"
+                                        th:text="${#temporals.format(visit.date,'yyyy-MM-dd')}"></td>
+                                    <td class="px-4 py-2 border" th:text="${visit?.description}"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="px-4 py-2 border">
+                                        <a th:href="@{__${owner.id}__/pets/__${pet.id}__/visits/new}"
+                                            class="text-blue-500 hover:underline">Add Visit</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+<!-- <body>
     <h1>Owner Information</h1>
     <div th:if="${message}">
         <span th:text="${message}"></span>
@@ -62,17 +152,35 @@
 
                     <dt>Edit Pet</dt>
                     <span>
-                        <!-- /owners/24/pets/1/edit -->
-                        <a  th:href="@{'/owners/__${owner.id}__/pets/__${pet.id}__/edit'}"
-                             class="fa fa-fast-forward">Edit</a>
-                        
-                    </span>
-                </dl>
-            </td>
+                         /owners/24/pets/1/edit 
+<a th:href="@{'/owners/__${owner.id}__/pets/__${pet.id}__/edit'}" class="fa fa-fast-forward">Edit</a>
+
+</span>
+</dl>
+</td>
+<td>
+    <table>
+        <thead>
+            <tr>
+                <th>Visit Date</th>
+                <th>description</th>
+            </tr>
+        </thead>
+        <tr th:each="visit: ${pet.visits}">
+            <td th:text="${#temporals.format(visit.date,'yyyy-MM-dd')}"></td>
+            <td th:text="${visit?.description}"></td>
         </tr>
+        <tr>
+            <a th:href="@{__${owner.id}__/pets/__${pet.id}__/visits/new}">Add Visit</a>
+        </tr>
+
     </table>
+</td>
+</tr>
+</table>
 
 
-</body>
+</body> 
+ -->
 
 </html>
