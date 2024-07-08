@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("owners/{ownerId}")
@@ -137,14 +136,33 @@ public class PetController {
         return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
     }
 
-    @GetMapping("/pets/new2")
-    public String initCreationForm2(Owner owner, ModelMap model) {
-        Pet pet = new Pet();
+    @PostMapping("/pets/{petId}/edit")
+    public String processUpdateForm2(@Valid Pet pet, BindingResult result, Owner owner, ModelMap model,
+            RedirectAttributes redirectAttributes) {
+
+        String petName = pet.getName();
+
+        // checking if the pet name already exist for the owner
+        if (StringUtils.hasText(petName)) {
+            Pet existingPet = owner.getPetByName(petName.toLowerCase(), false);
+            if (existingPet != null && existingPet.getId() != pet.getId()) {
+                result.rejectValue("name", "duplicate", "already exists");
+            }
+        }
+
+        LocalDate currentDate = LocalDate.now();
+        if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+            result.rejectValue("birthDate", "typeMismatch.birthDate");
+        }
+
+        if (result.hasErrors()) {
+            model.put("pet", pet);
+            return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+        }
+
         owner.addpet(pet);
-        model.put("pet", pet);
-        return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+        this.owners.save(owner);
+        redirectAttributes.addFlashAttribute("message", "Pet details has been edited");
+        return "redirect:/owners/{ownerId}";
     }
-
-    
-
 }
