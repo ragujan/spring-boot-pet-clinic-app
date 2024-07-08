@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("owners/{ownerId}")
@@ -93,7 +94,7 @@ public class PetController {
     @PostMapping("/pets/new")
     // public String processPetCreationForm(@Valid Pet pet,@PathVariable Integer
     // ownerId) {
-    public String processCreationForm(Owner owner, @Valid Pet pet,BindingResult bindingResult,
+    public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult bindingResult,
             RedirectAttributes redirectAttributes, ModelMap modelMap) {
         System.out.println("pet " + pet.getName());
         System.out.println("pet bdate" + pet.getBirthDate());
@@ -102,27 +103,48 @@ public class PetController {
         modelMap.put("pet", pet);
         modelMap.put("owner", owner);
         // process to check duplicate name
-        if(StringUtils.hasText(pet.getName()) 
-        && pet.isNew() 
-        && owner.getPetByName(pet.getName(), true) !=null ){
-            bindingResult.rejectValue("name","duplicate","already exists");
+        if (StringUtils.hasText(pet.getName())
+                && pet.isNew()
+                && owner.getPetByName(pet.getName(), true) != null) {
+            bindingResult.rejectValue("name", "duplicate", "already exists");
         }
         // process to check if the birthdate is valid
         LocalDate currentDate = LocalDate.now();
-        if(pet.getBirthDate()!=null && pet.getBirthDate().isAfter(currentDate)){
-            bindingResult.rejectValue("birthDate","Type mis match.birthDate");
+        if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+            bindingResult.rejectValue("birthDate", "Type mis match.birthDate");
         }
         owner.addpet(pet);
-        // if there is errors in binding results 
-        if(bindingResult.hasErrors()){
-            modelMap.put("pet",pet);
+        // if there is errors in binding results
+        if (bindingResult.hasErrors()) {
+            modelMap.put("pet", pet);
             return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 
         }
         this.owners.save(owner);
-        redirectAttributes.addFlashAttribute("message","New Pet has been added ");
+        redirectAttributes.addFlashAttribute("message", "New Pet has been added ");
         return "redirect:/owners/{ownerId}";
 
     }
+
+    // to show the edit pet form
+    // example url
+    // localhost:8080/owners/24/pets/edit
+    @GetMapping("/pets/{petId}/edit")
+    public String initUpdateForm(Owner owner, @PathVariable("petId") int petId, ModelMap model,
+            RedirectAttributes redirectAttributes) {
+        Pet pet = owner.getPetById(petId);
+        model.put("pet", pet);
+        return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+    }
+
+    @GetMapping("/pets/new2")
+    public String initCreationForm2(Owner owner, ModelMap model) {
+        Pet pet = new Pet();
+        owner.addpet(pet);
+        model.put("pet", pet);
+        return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+    }
+
+    
 
 }
