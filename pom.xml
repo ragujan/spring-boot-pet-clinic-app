@@ -19,7 +19,10 @@
 	</properties>
 	<dependencies>
 
-
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp -->
 		<dependency>
 			<groupId>com.squareup.okhttp</groupId>
