@@ -20,7 +20,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "pets")
-public class Pet extends NamedEntity{
+public class Pet extends NamedEntity {
     @Column(name = "birth_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
@@ -33,8 +33,6 @@ public class Pet extends NamedEntity{
     @JoinColumn(name = "pet_id")
     @OrderBy("visit_date ASC")
     private Set<Visit> vists = new LinkedHashSet<>();
-
-
 
     public LocalDate getBirthDate() {
         return birthDate;
@@ -56,9 +54,8 @@ public class Pet extends NamedEntity{
         return vists;
     }
 
-    public void setVists(Set<Visit> vists) {
-        this.vists = vists;
+    public void addVisit(Visit vist) {
+        getVists().add(vist);
     }
-
 
 }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>
+        <th:block th:if="${visit['new']}">New</th>
+    </h2>
+
+    <b>Pet</b>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Birth Date</th>
+                <th>Type</th>
+                <th>Owner</th>
+            </tr>
+        </thead>
+        <tr>
+            <td th:text="${pet.name}"></td>
+            <td th:text="${#temporals.format(pet.birthDate, 'yyyy-MM-dd')}">
+            </td>
+            <td th:text="${pet.type}"></td>
+            <td th:text="${owner?.firstName+ ' '+owner?.lastName}"></td>
+        </tr>
+    </table>
+
+    <form th:object="${visit}" method="post">
+        <!-- input fields for date and description -->
+        <div>
+            <input name="date" type="date">
+            <input name="description" type="text">
+        </div>
+        <!-- submit button -->
+         <div>
+            <input name="petId" th:value="${pet.id}"/>
+            <button type="submit">Add Visit</button>
+         </div>
+    </form>
+</body>
+
+</html>

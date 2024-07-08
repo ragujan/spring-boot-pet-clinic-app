@@ -53,12 +53,20 @@
                     <dt>----------</dt>
                     <dt>Name</dt>
                     <dd th:text="${pet.name}"></dd>
-                
+
                     <dt>Birth date</dt>
                     <dd th:text="${#temporals.format(pet.birthDate,'yyy-MM-dd')}"></dd>
 
                     <dt>Type</dt>
                     <dd th:text="${pet.type}"></dd>
+
+                    <dt>Edit Pet</dt>
+                    <span>
+                        <!-- /owners/24/pets/1/edit -->
+                        <a  th:href="@{'/owners/__${owner.id}__/pets/__${pet.id}__/edit'}"
+                             class="fa fa-fast-forward">Edit</a>
+                        
+                    </span>
                 </dl>
             </td>
         </tr>
