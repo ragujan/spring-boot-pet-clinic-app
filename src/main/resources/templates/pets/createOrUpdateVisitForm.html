@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
 </head>
 
-<body>
+<!-- <body>
     <h2>
         <th:block th:if="${visit['new']}">New</th>
     </h2>
@@ -32,17 +33,65 @@
     </table>
 
     <form th:object="${visit}" method="post">
-        <!-- input fields for date and description -->
+        
         <div>
             <input name="date" type="date">
             <input name="description" type="text">
         </div>
-        <!-- submit button -->
-         <div>
-            <input name="petId" th:value="${pet.id}"/>
+        
+        <div>
+            <input name="petId" th:value="${pet.id}" />
             <button type="submit">Add Visit</button>
-         </div>
+        </div>
     </form>
+</body> -->
+
+<body class="text-gray-800 bg-gray-100">
+
+    <div class="container p-6 mx-auto">
+        <h2 class="mb-4 text-3xl font-bold">
+            <th:block th:if="${visit['new']}">New</th:block>
+            Visit
+        </h2>
+
+        <b class="block mb-2 text-lg font-semibold">Pet</b>
+        <table class="min-w-full mb-6 overflow-hidden bg-white rounded-lg shadow">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 border">Name</th>
+                    <th class="px-4 py-2 border">Birth Date</th>
+                    <th class="px-4 py-2 border">Type</th>
+                    <th class="px-4 py-2 border">Owner</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="px-4 py-2 border" th:text="${pet.name}"></td>
+                    <td class="px-4 py-2 border" th:text="${#temporals.format(pet.birthDate, 'yyyy-MM-dd')}"></td>
+                    <td class="px-4 py-2 border" th:text="${pet.type}"></td>
+                    <td class="px-4 py-2 border" th:text="${owner?.firstName + ' ' + owner?.lastName}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <form th:object="${visit}" method="post" class="p-6 bg-white rounded-lg shadow">
+            <div class="mb-4">
+                <label for="date" class="block mb-2 font-bold text-gray-700">Date</label>
+                <input name="date" type="date" class="block w-full mt-1 form-input" />
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block mb-2 font-bold text-gray-700">Description</label>
+                <input name="description" type="text" class="block w-full mt-1 bg-gray-400 border-red-500 outline-2 form-input" />
+            </div>
+            <input name="petId" type="hidden" th:value="${pet.id}" />
+            <div class="flex justify-end">
+                <button type="submit"
+                    class="px-4 py-2 font-bold text-white bg-blue-500 rounded btn btn-primary hover:bg-blue-700">Add
+                    Visit</button>
+            </div>
+        </form>
+    </div>
+
 </body>
 
 </html>

@@ -6,9 +6,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>createOrUpdatePetForm</title>
+   <link rel="stylesheet" th:href="@{/css/output.css}" />
 </head>
 
-<body>
+<body class="text-gray-800 bg-gray-100">
+
+  <div class="container p-6 mx-auto">
+    <h2 class="mb-4 text-3xl font-bold">
+      <th:block th:if="${pet['new']}">New </th:block>
+      Pet
+    </h2>
+
+    <form th:object="${pet}" class="p-6 bg-white rounded-lg shadow" method="post">
+      <input type="hidden" name="id" th:value="*{id}" />
+      <div class="mb-4">
+        <label class="block mb-2 font-bold text-gray-700">Owner</label>
+        <div class="p-2 bg-gray-100 rounded">
+          <span th:text="${owner?.firstName + ' ' + owner?.lastName}" class="text-gray-800"></span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <input th:replace="~{fragments/inputField :: input ('Name', 'name', 'text')}"
+          class="block w-full mt-1 form-input" />
+      </div>
+
+      <div class="mb-4">
+        <input th:replace="~{fragments/inputField :: input ('Birth Date', 'birthDate', 'date')}"
+          class="block w-full mt-1 form-input" />
+      </div>
+
+      <div class="mb-4">
+        <input th:replace="~{fragments/selectField :: select ('Type', 'type', ${petTypes})}"
+          class="block w-full mt-1 form-select" />
+      </div>
+
+      <div class="flex justify-end">
+        <button th:with="text=${pet['new']} ? 'Add Pet' : 'Update Pet'"
+          class="px-4 py-2 font-bold text-white bg-blue-500 rounded btn btn-primary hover:bg-blue-700" type="submit"
+          th:text="${text}">Add Pet</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+
+<!-- <body>
 
   <h2>
     <th:block th:if="${pet['new']}">New </th:block>
@@ -36,6 +79,6 @@
     </div>
   </form>
 
-</body>
+</body> -->
 
 </html>
