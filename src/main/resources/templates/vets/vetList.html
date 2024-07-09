@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+    <title>Document</title>
+</head>
+
+<body class="text-gray-800 bg-gray-100">
+
+    <div class="container p-6 mx-auto">
+        <table class="min-w-full mb-6 overflow-hidden bg-white rounded-lg shadow">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 border">Name</th>
+                    <th class="px-4 py-2 border">Specialties</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="vet: ${listVets}">
+                    <td class="px-4 py-2 border" th:text="${vet.firstName + ' ' + vet.lastName}"></td>
+                    <td class="px-4 py-2 border">
+                        <span th:if="${vet.nrOfSpecialties == 0}">Empty</span>
+                        <ul th:if="${vet.nrOfSpecialties != 0}">
+                            <li th:each="specialty: ${vet.specialties}" th:text="${specialty.name + ' '}"></li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${totalPages > 1}" class="mt-6">
+            <span class="font-semibold">Pages:</span>
+            <span>[</span>
+            <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+                <a th:if="${currentPage != i}" th:href="@{'/vets.html?page=__${i}__'}"
+                    class="text-blue-500 hover:underline">[[${i}]]</a>
+                <span th:unless="${currentPage != i}" class="font-semibold">[[${i}]]</span>
+            </span>
+            <span>] </span>
+
+            <span>
+                <a title="First" th:if="${currentPage > 1}" th:href="@{'/vets.html?page=1'}"
+                    class="text-blue-500 hover:underline">First</a>
+                <span th:unless="${currentPage > 1}" title="First" class="text-gray-500">First</span>
+            </span>
+            <span>
+                <a title="Previous" th:if="${currentPage > 1}" th:href="@{'/vets.html?page=__${currentPage - 1}__'}"
+                    class="text-blue-500 hover:underline">Previous</a>
+                <span th:unless="${currentPage > 1}" title="Previous" class="text-gray-500">Previous</span>
+            </span>
+            <span>
+                <a title="Next" th:if="${currentPage < totalPages}"
+                    th:href="@{'/vets.html?page=__${currentPage + 1}__'}" class="text-blue-500 hover:underline">Next</a>
+                <span th:unless="${currentPage < totalPages}" title="Next" class="text-gray-500">Next</span>
+            </span>
+            <span>
+                <a title="Last" th:if="${currentPage < totalPages}" th:href="@{'/vets.html?page=__${totalPages}__'}"
+                    class="text-blue-500 hover:underline">Last</a>
+                <span th:unless="${currentPage < totalPages}" title="Last" class="text-gray-500">Last</span>
+            </span>
+        </div>
+    </div>
+
+</body>
+
+</html>
